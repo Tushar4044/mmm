@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .container {
+      width: 300px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      background-color: #f4f4f4;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+
+    input[type="submit"] {
+      width: 100%;
+      padding: 10px;
+      background-color: #4CAF50;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .error {
+      color: red;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Login</h2>
+    <form id="loginForm" onsubmit="return validateForm()">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" required>
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" required>
+      <input type="submit" value="Login">
+    </form>
+    <div id="errorMessages"></div>
+  </div>
+</body>
+</html>
+
+
+    function validateForm() {
+      var username = document.getElementById("username").value;
+      var password = document.getElementById("password").value;
+      var errorMessages = "";
+
+      // Username validation
+      var usernameRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,}$/;
+      if (!usernameRegex.test(username)) {
+        errorMessages += "Username should contain at least one uppercase letter, one lowercase letter, one special character, one number, and be at least 8 characters long.<br>";
+      }
+
+      // Password validation
+      var passwordRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,}$/;
+      if (!passwordRegex.test(password)) {
+        errorMessages += "Password should contain at least one uppercase letter, one special character, and be at least 8 characters long.<br>";
+      }
+
+      // Display error messages or submit the form
+      if (errorMessages !== "") {
+        document.getElementById("errorMessages").innerHTML = '<div class="error">' + errorMessages + '</div>';
+        return false;
+      } else {
+        // Submit the form or perform further actions
+        return true;
+      }
+    }
+ 

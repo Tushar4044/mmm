@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+#include <stdbool.h>
+
+int absDiff(int a, int b) {
+    return (a > b) ? (a - b) : (b - a);
+}
+
+int findShortestSeek(int requestQueue[], bool visited[], int headPosition, int numRequests) {
+    int shortestSeek = INT_MAX;
+    int shortestSeekIndex = -1;
+    int i;
+
+    for (i = 0; i < numRequests; i++) {
+        if (!visited[i] && absDiff(headPosition, requestQueue[i]) < shortestSeek) {
+            shortestSeek = absDiff(headPosition, requestQueue[i]);
+            shortestSeekIndex = i;
+        }
+    }
+
+    return shortestSeekIndex;
+}
+
+void sstfDiskScheduling(int requestQueue[], int numRequests, int headPosition) {
+    bool visited[numRequests];
+    int seekSequence[numRequests];
+    int totalSeekTime = 0;
+    int i;
+
+    for (i = 0; i < numRequests; i++) {
+        visited[i] = false;
+    }
+
+    for (i = 0; i < numRequests; i++) {
+        int shortestSeekIndex = findShortestSeek(requestQueue, visited, headPosition, numRequests);
+        visited[shortestSeekIndex] = true;
+        seekSequence[i] = requestQueue[shortestSeekIndex];
+        totalSeekTime += absDiff(headPosition, requestQueue[shortestSeekIndex]);
+        headPosition = requestQueue[shortestSeekIndex];
+    }
+
+    printf("Seek Sequence: ");
+    for (i = 0; i < numRequests; i++) {
+        printf("%d ", seekSequence[i]);
+    }
+    printf("\nTotal Seek Time: %d\n", totalSeekTime);
+}
+
+int main() {
+    int numRequests;
+    printf("Enter the number of disk requests: ");
+    scanf("%d", &numRequests);
+
+    int requestQueue[numRequests];
+    int i;
+    printf("Enter the disk requests:\n");
+    for (i = 0; i < numRequests; i++) {
+        printf("Request %d: ", i + 1);
+        scanf("%d", &requestQueue[i]);
+    }
+
+    int headPosition;
+    printf("Enter the current disk head position: ");
+    scanf("%d", &headPosition);
+
+    sstfDiskScheduling(requestQueue, numRequests, headPosition);
+
+    return 0;
+}

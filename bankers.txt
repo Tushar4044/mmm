@@ -1,0 +1,82 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+#define NUM_PROCESSES 5
+#define NUM_RESOURCES 3
+
+int available[NUM_RESOURCES] = {10, 5, 7};
+int maximum[NUM_PROCESSES][NUM_RESOURCES] = {
+    {7, 5, 3},
+    {3, 2, 2},
+    {9, 0, 2},
+    {2, 2, 2},
+    {4, 3, 3}
+};
+int allocation[NUM_PROCESSES][NUM_RESOURCES] = {
+    {0, 1, 0},
+    {2, 0, 0},
+    {3, 0, 2},
+    {2, 1, 1},
+    {0, 0, 2}
+};
+int need[NUM_PROCESSES][NUM_RESOURCES];
+
+bool isSafeState() {
+    int work[NUM_RESOURCES];
+    bool finish[NUM_PROCESSES] = {false};
+    int i, j, k;
+
+    // Initialize work array
+    for (i = 0; i < NUM_RESOURCES; i++) {
+        work[i] = available[i];
+    }
+
+    // Initialize need matrix
+    for (i = 0; i < NUM_PROCESSES; i++) {
+        for (j = 0; j < NUM_RESOURCES; j++) {
+            need[i][j] = maximum[i][j] - allocation[i][j];
+        }
+    }
+
+    // Find a process that can be executed
+    for (i = 0; i < NUM_PROCESSES; i++) {
+        for (j = 0; j < NUM_PROCESSES; j++) {
+            if (!finish[j]) {
+                bool canExecute = true;
+                for (k = 0; k < NUM_RESOURCES; k++) {
+                    if (need[j][k] > work[k]) {
+                        canExecute = false;
+                        break;
+                    }
+                }
+                if (canExecute) {
+                    // Execute process j
+                    for (k = 0; k < NUM_RESOURCES; k++) {
+                        work[k] += allocation[j][k];
+                    }
+                    finish[j] = true;
+                    break;
+                }
+            }
+        }
+    }
+
+    // Check if all processes have finished
+    for (i = 0; i < NUM_PROCESSES; i++) {
+        if (!finish[i]) {
+            return false; // System is in an unsafe state
+        }
+    }
+
+    return true; // System is in a safe state
+}
+
+int main() {
+    if (isSafeState()) {
+        printf("System is in a safe state.\n");
+    } else {
+        printf("System is in an unsafe state.\n");
+    }
+
+    return 0;
+}

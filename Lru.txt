@@ -1,0 +1,99 @@
+#include <stdio.h>
+#include <stdbool.h>
+
+int findPageIndex(int page, int frames[], int numFrames) {
+    int i;
+    for (i = 0; i < numFrames; i++) {
+        if (frames[i] == page) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void updatePageUsage(int page, int pageUsage[], int numFrames) {
+    int i;
+    for (i = 0; i < numFrames; i++) {
+        if (pageUsage[i] != -1) {
+            pageUsage[i]++;
+        }
+    }
+    pageUsage[findPageIndex(page, pageUsage, numFrames)] = 0;
+}
+
+void displayFrames(int frames[], int numFrames) {
+    int i;
+    for (i = 0; i < numFrames; i++) {
+        if (frames[i] == -1) {
+            printf("- ");
+        } else {
+            printf("%d ", frames[i]);
+        }
+    }
+    printf("\n");
+}
+
+void lruPageReplacement(int pages[], int numPages, int numFrames) {
+    int frames[numFrames];
+    int pageUsage[numFrames];
+    int pageFaults = 0;
+    int i, j;
+
+    for (i = 0; i < numFrames; i++) {
+        frames[i] = -1; // Initialize frames with empty slots
+        pageUsage[i] = -1; // Initialize page usage with -1
+    }
+
+    printf("Page Faults:\n");
+
+    for (i = 0; i < numPages; i++) {
+        int page = pages[i];
+        int pageIndex = findPageIndex(page, frames, numFrames);
+
+        if (pageIndex == -1) {
+            // Page fault occurred
+            printf("Page %d -> ", page);
+
+            int lruIndex = 0;
+            for (j = 1; j < numFrames; j++) {
+                if (pageUsage[j] > pageUsage[lruIndex]) {
+                    lruIndex = j;
+                }
+            }
+
+            if (frames[lruIndex] != -1) {
+                printf("Page %d replaced\n", frames[lruIndex]);
+            } else {
+                printf("No page replaced\n");
+            }
+
+            frames[lruIndex] = page;
+            pageFaults++;
+        }
+
+        updatePageUsage(page, pageUsage, numFrames);
+        displayFrames(frames, numFrames);
+    }
+
+    printf("\nTotal Page Faults: %d\n", pageFaults);
+}
+
+int main() {
+    int numFrames, numPages;
+    printf("Enter the number of frames: ");
+    scanf("%d", &numFrames);
+    printf("Enter the number of pages: ");
+    scanf("%d", &numPages);
+
+    int pages[numPages];
+    int i;
+    printf("Enter the page reference string:\n");
+    for (i = 0; i < numPages; i++) {
+        printf("Page %d: ", i + 1);
+        scanf("%d", &pages[i]);
+    }
+
+    lruPageReplacement(pages, numPages, numFrames);
+
+    return 0;
+}
